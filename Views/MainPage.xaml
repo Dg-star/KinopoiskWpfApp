@@ -1,37 +1,68 @@
-﻿<Page
-    x:Class="KinopoiskWpfApp.Views.MainPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Главная страница">
+﻿<Page x:Class="KinopoiskWpfApp.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Главная">
 
-    <Grid>
-        <StackPanel Margin="20">
-
-            <!-- Фильтры -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10" HorizontalAlignment="Left" >
-
-                <ComboBox Width="150" ItemsSource="{Binding Genres}" SelectedItem="{Binding SelectedGenre}" DisplayMemberPath="Name" Margin="0,0,10,0"/>
-
-                <ComboBox Width="150" ItemsSource="{Binding Countries}" SelectedItem="{Binding SelectedCountry}" DisplayMemberPath="Name" />
-
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock Text="Популярные фильмы" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+            
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <ComboBox Width="200"
+              ItemsSource="{Binding Genres}"
+              DisplayMemberPath="Name"
+              SelectedItem="{Binding SelectedGenre}" 
+              Margin="0,0,10,0"/>
+                <ComboBox Width="200"
+              ItemsSource="{Binding Countries}"
+              DisplayMemberPath="Name"
+              SelectedItem="{Binding SelectedCountry}"/>
             </StackPanel>
+            <!-- Обёртка с вертикальной прокруткой -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="650">
+                <ItemsControl ItemsSource="{Binding Films}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="0,0,0,10"/>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="FrameworkElement.Margin" Value="5"/>
+                            <Setter Property="FrameworkElement.Width" Value="360" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
 
-            <TextBlock Text="Загрузка..." Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" FontStyle="Italic" Margin="0,0,0,10"/>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Width="360">
+                                <StackPanel>
+                                    <Grid>
+                                        <!-- Постер фильма -->
+                                        <Image Source="{Binding PosterUrlPreview}" Stretch="Uniform" Width="360" />
 
-            <ListBox ItemsSource="{Binding Films}" Height="400">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="{Binding NameRu}" FontWeight="Bold" Width="300"/>
-                            <TextBlock Text="{Binding Year}" Margin="10,0,0,0" Width="50"/>
-                            <Button Content="♥" Command="{Binding DataContext.AddToFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Margin="10,0,0,0" Width="30" Height="25"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                                        <!-- Кнопка добавления в избранное -->
+                                        <Button Content="★"
+                                                HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                Command="{Binding DataContext.AddToFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderBrush="Transparent"
+                                                FontSize="20" Foreground="Yellow"
+                                                Margin="10"/>
+                                    </Grid>
 
+                                    <!-- Подпись с названием и годом -->
+                                    <StackPanel Margin="0,5,0,10" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding NameRu}" FontWeight="Bold" TextAlignment="Center" TextWrapping="Wrap" Width="340"/>
+                                        <TextBlock Text="{Binding Year}" FontStyle="Italic" Foreground="Gray" TextAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </StackPanel>
     </Grid>
 </Page>

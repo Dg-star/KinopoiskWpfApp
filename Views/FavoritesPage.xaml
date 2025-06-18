@@ -20,20 +20,48 @@
                           SelectedItem="{Binding SelectedCountry}"/>
             </StackPanel>
 
-            <!-- Список фильмов -->
-            <ListBox ItemsSource="{Binding FilteredFavoriteFilms}" Height="400">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <TextBlock Text="{Binding NameRu}" FontWeight="Bold" Width="300"/>
-                            <TextBlock Text="{Binding Year}" Margin="10,0,0,0" Width="50"/>
-                            <Button Content="Удалить"
-                                    Command="{Binding DataContext.RemoveFromFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                    CommandParameter="{Binding}" Margin="10,0,0,0"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <!-- Сетка фильмов с прокруткой -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="600">
+                <ItemsControl ItemsSource="{Binding FilteredFavoriteFilms}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="FrameworkElement.Margin" Value="5"/>
+                            <Setter Property="FrameworkElement.Width" Value="360" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Width="360">
+                                <StackPanel>
+                                    <Grid>
+                                        <Image Source="{Binding PosterUrlPreview}" Stretch="Uniform" Width="360" Height="540"/>
+
+                                        <Button Content="✕"
+                                                HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                Command="{Binding DataContext.RemoveFromFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderBrush="Transparent"
+                                                FontSize="20" Foreground="Red"
+                                                Margin="10"/>
+                                    </Grid>
+
+                                    <StackPanel Margin="0,5,0,10" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding NameRu}" FontWeight="Bold" TextAlignment="Center" TextWrapping="Wrap" Width="340"/>
+                                        <TextBlock Text="{Binding Year}" FontStyle="Italic" Foreground="Gray" TextAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </StackPanel>
     </Grid>
 </Page>
