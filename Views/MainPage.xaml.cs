@@ -16,7 +16,7 @@ namespace KinopoiskWpfApp.Views
             var favoritesService = new FavoritesService();
             var filtersCacheService = new FiltersCacheService();
             var filmsCacheService = new FilmsCacheService();
-            _viewModel = new MainViewModel(kinopoiskService, favoritesService, filtersCacheService, filmsCacheService);
+            _viewModel = new MainViewModel(kinopoiskService, favoritesService, filtersCacheService, filmsCacheService, NavigationService);
 
             this.DataContext = _viewModel;
 

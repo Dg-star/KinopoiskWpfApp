@@ -14,7 +14,6 @@ namespace KinopoiskWpfApp.Services
 
         private List<Film> _favorites = new List<Film>();
 
-        // ObservableCollection для UI (уведомляет об изменениях)
         public ObservableCollection<Film> FavoriteFilms { get; private set; } = new ObservableCollection<Film>();
 
         public FavoritesService()
@@ -34,7 +33,6 @@ namespace KinopoiskWpfApp.Services
                 _favorites = new List<Film>();
             }
 
-            // Заполняем ObservableCollection
             FavoriteFilms.Clear();
             foreach (var film in _favorites)
             {

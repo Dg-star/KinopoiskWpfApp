@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using KinopoiskWpfApp.Models;
 using KinopoiskWpfApp.Services;
+using KinopoiskWpfApp.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace KinopoiskWpfApp.ViewModels
 {
@@ -18,6 +20,7 @@ namespace KinopoiskWpfApp.ViewModels
         private readonly FavoritesService _favoritesService;
         private readonly FiltersCacheService _filtersCacheService;
         private readonly FilmsCacheService _filmsCacheService;
+        private readonly NavigationService _navigationService;
 
         private ObservableCollection<Film> _films = new ObservableCollection<Film>();
         private ObservableCollection<Genre> _genres = new ObservableCollection<Genre>();
@@ -29,8 +32,7 @@ namespace KinopoiskWpfApp.ViewModels
         private Genre _selectedGenre;
         private Country _selectedCountry;
 
-        private bool _isLoadingFilms = false; // Защита от параллельных вызовов
-
+        private bool _isLoadingFilms = false;
         public ObservableCollection<Film> Films
         {
             get => _films;
@@ -55,7 +57,7 @@ namespace KinopoiskWpfApp.ViewModels
             set
             {
                 if (SetProperty(ref _selectedGenre, value))
-                    _ = LoadFilmsAsync(); // Вызов без await, можно заменить на синхронную блокировку, если нужно
+                    _ = LoadFilmsAsync();
             }
         }
 
@@ -80,16 +82,31 @@ namespace KinopoiskWpfApp.ViewModels
             get => _errorMessage;
             set => SetProperty(ref _errorMessage, value);
         }
-
+        public ICommand NavigateToFilmDetailsCommand { get; }
         public ICommand LoadFilmsCommand { get; }
         public ICommand AddToFavoritesCommand { get; }
 
-        public MainViewModel(KinopoiskService kinopoiskService, FavoritesService favoritesService, FiltersCacheService filtersCacheService, FilmsCacheService filmsCacheService)
+        public MainViewModel(KinopoiskService kinopoiskService, FavoritesService favoritesService, FiltersCacheService filtersCacheService, FilmsCacheService filmsCacheService, NavigationService navigationService)
         {
             _kinopoiskService = kinopoiskService ?? throw new ArgumentNullException(nameof(kinopoiskService));
             _favoritesService = favoritesService ?? throw new ArgumentNullException(nameof(favoritesService));
             _filtersCacheService = filtersCacheService ?? throw new ArgumentNullException(nameof(filtersCacheService));
             _filmsCacheService = filmsCacheService ?? throw new ArgumentNullException(nameof(filmsCacheService));
+            _navigationService = navigationService;
+            NavigateToFilmDetailsCommand = new RelayCommand<Film>(film =>
+            {
+                if (film == null) return;
+
+                var detailsVM = new FilmDetailsViewModel(_favoritesService, film);
+                var detailsPage = new FilmDetailsPage(_favoritesService, film)
+                {
+                    DataContext = detailsVM
+                };
+
+                _navigationService.Navigate(detailsPage);
+            });
+
+            
 
             LoadFilmsCommand = new RelayCommand(async () => await LoadFilmsAsync());
             AddToFavoritesCommand = new RelayCommand<Film>(AddToFavorites);
