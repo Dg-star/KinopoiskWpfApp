@@ -9,7 +9,11 @@ namespace KinopoiskWpfApp.Views
         public FavoritesPage()
         {
             InitializeComponent();
-            DataContext = new FavoritesViewModel(new FavoritesService());
+
+            var favoritesService = new FavoritesService();
+            var filtersCacheService = new FiltersCacheService();
+
+            DataContext = new FavoritesViewModel(favoritesService, filtersCacheService);
         }
     }
 }

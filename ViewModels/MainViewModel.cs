@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using KinopoiskWpfApp.Models;
 using KinopoiskWpfApp.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace KinopoiskWpfApp.ViewModels
         private readonly KinopoiskService _kinopoiskService;
         private readonly FavoritesService _favoritesService;
         private readonly FiltersCacheService _filtersCacheService;
+        private readonly FilmsCacheService _filmsCacheService;
 
         private ObservableCollection<Film> _films = new ObservableCollection<Film>();
         private ObservableCollection<Genre> _genres = new ObservableCollection<Genre>();
@@ -26,6 +28,8 @@ namespace KinopoiskWpfApp.ViewModels
 
         private Genre _selectedGenre;
         private Country _selectedCountry;
+
+        private bool _isLoadingFilms = false; // Защита от параллельных вызовов
 
         public ObservableCollection<Film> Films
         {
@@ -51,7 +55,7 @@ namespace KinopoiskWpfApp.ViewModels
             set
             {
                 if (SetProperty(ref _selectedGenre, value))
-                    _ = LoadFilmsAsync();
+                    _ = LoadFilmsAsync(); // Вызов без await, можно заменить на синхронную блокировку, если нужно
             }
         }
 
@@ -80,11 +84,12 @@ namespace KinopoiskWpfApp.ViewModels
         public ICommand LoadFilmsCommand { get; }
         public ICommand AddToFavoritesCommand { get; }
 
-        public MainViewModel(KinopoiskService kinopoiskService, FavoritesService favoritesService, FiltersCacheService filtersCacheService)
+        public MainViewModel(KinopoiskService kinopoiskService, FavoritesService favoritesService, FiltersCacheService filtersCacheService, FilmsCacheService filmsCacheService)
         {
             _kinopoiskService = kinopoiskService ?? throw new ArgumentNullException(nameof(kinopoiskService));
             _favoritesService = favoritesService ?? throw new ArgumentNullException(nameof(favoritesService));
             _filtersCacheService = filtersCacheService ?? throw new ArgumentNullException(nameof(filtersCacheService));
+            _filmsCacheService = filmsCacheService ?? throw new ArgumentNullException(nameof(filmsCacheService));
 
             LoadFilmsCommand = new RelayCommand(async () => await LoadFilmsAsync());
             AddToFavoritesCommand = new RelayCommand<Film>(AddToFavorites);
@@ -135,13 +140,38 @@ namespace KinopoiskWpfApp.ViewModels
 
         public async Task LoadFilmsAsync()
         {
+            if (_isLoadingFilms) return; // Защита от параллельных вызовов
+
             try
             {
+                _isLoadingFilms = true;
                 ErrorMessage = null;
                 IsLoading = true;
                 Films.Clear();
 
-                var films = await _kinopoiskService.GetTopFilmsAsync();
+                var cachedFilms = _filmsCacheService.Load();
+
+                List<Film> films;
+
+                if (cachedFilms == null || cachedFilms.Count == 0)
+                {
+                    films = await _kinopoiskService.GetTopFilmsAsync();
+
+                    // Убираем дубли из API
+                    films = films
+                        .GroupBy(f => f.FilmId)
+                        .Select(g => g.First())
+                        .ToList();
+
+                    _filmsCacheService.Save(films);
+                }
+                else
+                {
+                    films = cachedFilms
+                        .GroupBy(f => f.FilmId)
+                        .Select(g => g.First())
+                        .ToList();
+                }
 
                 if (SelectedGenre != null && SelectedGenre.Id != 0)
                     films = films.Where(f => f.Genres.Any(g => string.Equals(g.Name, SelectedGenre.Name, StringComparison.OrdinalIgnoreCase))).ToList();
@@ -158,11 +188,11 @@ namespace KinopoiskWpfApp.ViewModels
             catch (Exception ex)
             {
                 ErrorMessage = $"Ошибка загрузки: {ex.Message}";
-                Debug.WriteLine($"Ошибка: {ex}");
             }
             finally
             {
                 IsLoading = false;
+                _isLoadingFilms = false;
             }
         }
 

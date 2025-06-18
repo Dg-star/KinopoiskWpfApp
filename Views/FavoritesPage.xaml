@@ -6,7 +6,22 @@
     <Grid Margin="20">
         <StackPanel>
             <TextBlock Text="Избранные фильмы" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-            <ListBox ItemsSource="{Binding FavoriteFilms}" Height="400">
+
+            <!-- Фильтры -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <ComboBox Width="200"
+                          ItemsSource="{Binding Genres}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedGenre}" 
+                          Margin="0,0,10,0"/>
+                <ComboBox Width="200"
+                          ItemsSource="{Binding Countries}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedCountry}"/>
+            </StackPanel>
+
+            <!-- Список фильмов -->
+            <ListBox ItemsSource="{Binding FilteredFavoriteFilms}" Height="400">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
