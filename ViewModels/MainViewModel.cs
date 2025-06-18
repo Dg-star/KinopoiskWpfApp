@@ -121,13 +121,21 @@ namespace KinopoiskWpfApp.ViewModels
 
                 Genres.Clear();
                 Genres.Add(new Genre { Id = 0, Name = "Все жанры" });
-                foreach (var genre in filters.Genres)
+                foreach (var genre in filters.Genres
+                                             .Where(g => !string.IsNullOrWhiteSpace(g.Name))
+                                             .OrderBy(g => g.Name))
+                {
                     Genres.Add(new Genre { Id = genre.Id, Name = genre.Name });
+                }
 
                 Countries.Clear();
                 Countries.Add(new Country { Id = 0, Name = "Все страны" });
-                foreach (var country in filters.Countries)
+                foreach (var country in filters.Countries
+                                               .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                                               .OrderBy(c => c.Name))
+                {
                     Countries.Add(new Country { Id = country.Id, Name = country.Name });
+                }
 
                 SelectedGenre = Genres.First();
                 SelectedCountry = Countries.First();
@@ -138,9 +146,10 @@ namespace KinopoiskWpfApp.ViewModels
             }
         }
 
+
         public async Task LoadFilmsAsync()
         {
-            if (_isLoadingFilms) return; // Защита от параллельных вызовов
+            if (_isLoadingFilms) return;
 
             try
             {

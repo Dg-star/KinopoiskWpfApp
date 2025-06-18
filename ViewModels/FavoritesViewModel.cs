@@ -85,17 +85,27 @@ namespace KinopoiskWpfApp.ViewModels
 
             Genres.Clear();
             Genres.Add(new Genre { Id = 0, Name = "Все жанры" });
-            foreach (var genre in filters.Genres)
+            foreach (var genre in filters.Genres
+                                          .Where(g => !string.IsNullOrWhiteSpace(g.Name))
+                                          .OrderBy(g => g.Name))
+            {
                 Genres.Add(genre);
+            }
 
             Countries.Clear();
             Countries.Add(new Country { Id = 0, Name = "Все страны" });
-            foreach (var country in filters.Countries)
+            foreach (var country in filters.Countries
+                                           .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                                           .OrderBy(c => c.Name))
+            {
                 Countries.Add(country);
+            }
 
             SelectedGenre = Genres.First();
             SelectedCountry = Countries.First();
         }
+
+
 
         private void ApplyFilters()
         {
