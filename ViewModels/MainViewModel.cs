@@ -13,6 +13,7 @@ namespace KinopoiskWpfApp.ViewModels
     public class MainViewModel : ObservableObject
     {
         private readonly KinopoiskService _kinopoiskService;
+        private readonly FavoritesService _favoritesService;
 
         private ObservableCollection<Film> _films;
         private bool _isLoading;
@@ -37,13 +38,31 @@ namespace KinopoiskWpfApp.ViewModels
         }
 
         public ICommand LoadFilmsCommand { get; }
+        public ICommand AddToFavoritesCommand { get; }
 
-        public MainViewModel(KinopoiskService kinopoiskService)
+        public MainViewModel(KinopoiskService kinopoiskService, FavoritesService favoritesService)
         {
             _kinopoiskService = kinopoiskService ?? throw new ArgumentNullException(nameof(kinopoiskService));
+            _favoritesService = favoritesService ?? throw new ArgumentNullException(nameof(favoritesService));
+
+
             Films = new ObservableCollection<Film>();
 
+            AddToFavoritesCommand = new RelayCommand<Film>(AddToFavorites);
             LoadFilmsCommand = new RelayCommand(async () => await LoadFilmsAsync());
+        }
+        private void AddToFavorites(Film film)
+        {
+            if (film == null) return;
+
+            try
+            {
+                _favoritesService.AddToFavorites(film);
+            }
+            catch (Exception ex)
+            {
+                
+            }
         }
 
         public async Task LoadFilmsAsync()

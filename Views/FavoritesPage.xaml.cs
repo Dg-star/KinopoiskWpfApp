@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using KinopoiskWpfApp.Services;
+using KinopoiskWpfApp.ViewModels;
+using System.Windows.Controls;
 
 namespace KinopoiskWpfApp.Views
 {
@@ -7,19 +9,7 @@ namespace KinopoiskWpfApp.Views
         public FavoritesPage()
         {
             InitializeComponent();
-
-            // Заглушка для избранного:
-            FavoritesListBox.ItemsSource = new[]
-            {
-                "Избранный фильм 1",
-                "Избранный фильм 2"
-            };
-        }
-
-        private void GoBack_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (this.NavigationService.CanGoBack)
-                this.NavigationService.GoBack();
+            DataContext = new FavoritesViewModel(new FavoritesService());
         }
     }
 }

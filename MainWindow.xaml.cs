@@ -26,5 +26,15 @@ namespace KinopoiskWpfApp
             InitializeComponent();
             MainFrame.Navigate(new MainPage());
         }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new MainPage());
+        }
+
+        private void FavoritesButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new FavoritesPage());
+        }
     }
 }
