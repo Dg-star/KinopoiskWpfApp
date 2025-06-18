@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using KinopoiskWpfApp.Services;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace KinopoiskWpfApp.Models
 {
@@ -15,5 +17,11 @@ namespace KinopoiskWpfApp.Models
 
         [JsonProperty("posterUrlPreview")]
         public string PosterUrlPreview { get; set; }
+
+        [JsonProperty("genres")]
+        public List<Genre> Genres { get; set; } = new List<Genre>();
+
+        [JsonProperty("countries")]
+        public List<Country> Countries { get; set; } = new List<Country>();
     }
 }

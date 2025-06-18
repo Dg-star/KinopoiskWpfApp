@@ -5,6 +5,7 @@ using KinopoiskWpfApp.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -15,26 +16,68 @@ namespace KinopoiskWpfApp.ViewModels
         private readonly KinopoiskService _kinopoiskService;
         private readonly FavoritesService _favoritesService;
 
-        private ObservableCollection<Film> _films;
+        private ObservableCollection<Film> _films = new ObservableCollection<Film>();
+        private ObservableCollection<Genre> _genres = new ObservableCollection<Genre>();
+        private ObservableCollection<Country> _countries = new ObservableCollection<Country>();
+
         private bool _isLoading;
         private string _errorMessage;
+
+        private Genre _selectedGenre;
+        private Country _selectedCountry;
 
         public ObservableCollection<Film> Films
         {
             get => _films;
-            private set => SetProperty(ref _films, value);
+            set => SetProperty(ref _films, value);
+        }
+
+        public ObservableCollection<Genre> Genres
+        {
+            get => _genres;
+            set => SetProperty(ref _genres, value);
+        }
+
+        public ObservableCollection<Country> Countries
+        {
+            get => _countries;
+            set => SetProperty(ref _countries, value);
+        }
+
+        public Genre SelectedGenre
+        {
+            get => _selectedGenre;
+            set
+            {
+                if (SetProperty(ref _selectedGenre, value))
+                {
+                    _ = LoadFilmsAsync();
+                }
+            }
+        }
+
+        public Country SelectedCountry
+        {
+            get => _selectedCountry;
+            set
+            {
+                if (SetProperty(ref _selectedCountry, value))
+                {
+                    _ = LoadFilmsAsync();
+                }
+            }
         }
 
         public bool IsLoading
         {
             get => _isLoading;
-            private set => SetProperty(ref _isLoading, value);
+            set => SetProperty(ref _isLoading, value);
         }
 
         public string ErrorMessage
         {
             get => _errorMessage;
-            private set => SetProperty(ref _errorMessage, value);
+            set => SetProperty(ref _errorMessage, value);
         }
 
         public ICommand LoadFilmsCommand { get; }
@@ -45,23 +88,46 @@ namespace KinopoiskWpfApp.ViewModels
             _kinopoiskService = kinopoiskService ?? throw new ArgumentNullException(nameof(kinopoiskService));
             _favoritesService = favoritesService ?? throw new ArgumentNullException(nameof(favoritesService));
 
-
-            Films = new ObservableCollection<Film>();
-
-            AddToFavoritesCommand = new RelayCommand<Film>(AddToFavorites);
             LoadFilmsCommand = new RelayCommand(async () => await LoadFilmsAsync());
-        }
-        private void AddToFavorites(Film film)
-        {
-            if (film == null) return;
+            AddToFavoritesCommand = new RelayCommand<Film>(AddToFavorites);
 
+            // Инициализация коллекций
+            Films = new ObservableCollection<Film>();
+            Genres = new ObservableCollection<Genre>();
+            Countries = new ObservableCollection<Country>();
+
+            // Загрузка фильтров и фильмов при старте
+            _ = InitializeAsync();
+        }
+
+        private async Task InitializeAsync()
+        {
+            await LoadFiltersAsync();
+            await LoadFilmsAsync();
+        }
+
+        private async Task LoadFiltersAsync()
+        {
             try
             {
-                _favoritesService.AddToFavorites(film);
+                var filters = await _kinopoiskService.GetFiltersAsync();
+
+                Genres.Clear();
+                Genres.Add(new Genre { Id = 0, Name = "Все жанры" });
+                foreach (var genre in filters.Genres)
+                    Genres.Add(genre);
+
+                Countries.Clear();
+                Countries.Add(new Country { Id = 0, Name = "Все страны" });
+                foreach (var country in filters.Countries)
+                    Countries.Add(country);
+
+                SelectedGenre = Genres.First();
+                SelectedCountry = Countries.First();
             }
             catch (Exception ex)
             {
-                
+                ErrorMessage = $"Ошибка загрузки фильтров: {ex.Message}";
             }
         }
 
@@ -75,18 +141,17 @@ namespace KinopoiskWpfApp.ViewModels
 
                 var films = await _kinopoiskService.GetTopFilmsAsync();
 
-                Debug.WriteLine($"Получено фильмов: {films?.Count}");
-                if (films != null && films.Count > 0)
-                {
-                    foreach (var film in films)
-                    {
-                        Films.Add(film);
-                    }
-                }
-                else
-                {
-                    ErrorMessage = "Не удалось загрузить фильмы. Список пуст.";
-                }
+                if (SelectedGenre != null && SelectedGenre.Id != 0)
+                    films = films.Where(f => f.Genres.Any(g => g.Id == SelectedGenre.Id)).ToList();
+
+                if (SelectedCountry != null && SelectedCountry.Id != 0)
+                    films = films.Where(f => f.Countries.Any(c => c.Id == SelectedCountry.Id)).ToList();
+
+                foreach (var film in films)
+                    Films.Add(film);
+
+                if (Films.Count == 0)
+                    ErrorMessage = "Нет фильмов по выбранным фильтрам.";
             }
             catch (Exception ex)
             {
@@ -96,6 +161,20 @@ namespace KinopoiskWpfApp.ViewModels
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private void AddToFavorites(Film film)
+        {
+            if (film == null) return;
+
+            try
+            {
+                _favoritesService.AddToFavorites(film);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка добавления в избранное: {ex.Message}");
             }
         }
     }

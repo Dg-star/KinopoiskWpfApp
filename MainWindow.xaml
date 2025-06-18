@@ -8,16 +8,12 @@
         Title="Kinopoisk WPF" Height="600" Width="800">
 
     <DockPanel>
-
-        <!-- Верхняя панель навигации -->
         <Border Background="#FFEEEEEE" Padding="10" DockPanel.Dock="Top">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button Content="Главная" Click="HomeButton_Click" Margin="0,0,10,0" Width="100"/>
                 <Button Content="Избранное" Click="FavoritesButton_Click" Width="100"/>
             </StackPanel>
         </Border>
-
-        <!-- Основная область отображения страниц -->
         <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
     </DockPanel>
 </Window>
