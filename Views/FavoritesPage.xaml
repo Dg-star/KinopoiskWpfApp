@@ -1,0 +1,11 @@
+﻿<Page x:Class="KinopoiskWpfApp.Views.FavoritesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="FavoritesPage">
+
+    <StackPanel Margin="10">
+        <TextBlock Text="Избранное" FontSize="24" Margin="0,0,0,10"/>
+        <ListBox x:Name="FavoritesListBox" />
+        <Button Content="Назад" Margin="0,10,0,0" Click="GoBack_Click"/>
+    </StackPanel>
+</Page>
