@@ -1,12 +1,11 @@
-﻿using KinopoiskWpfApp.Services;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace KinopoiskWpfApp.Models
 {
     public class Film
     {
-        [JsonProperty("filmId")]
+        [JsonProperty("kinopoiskId")]
         public int FilmId { get; set; }
 
         [JsonProperty("nameRu")]
@@ -23,5 +22,23 @@ namespace KinopoiskWpfApp.Models
 
         [JsonProperty("countries")]
         public List<Country> Countries { get; set; } = new List<Country>();
+    }
+
+    public class Genre
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("genre")]
+        public string Name { get; set; }
+    }
+
+    public class Country
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("country")]
+        public string Name { get; set; }
     }
 }

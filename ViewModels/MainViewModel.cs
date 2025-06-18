@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using KinopoiskWpfApp.Models;
-using KinopoiskWpfApp.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -9,42 +7,46 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+// Явные алиасы для устранения неоднозначности имён
+using Models = KinopoiskWpfApp.Models;
+using Services = KinopoiskWpfApp.Services;
+
 namespace KinopoiskWpfApp.ViewModels
 {
     public class MainViewModel : ObservableObject
     {
-        private readonly KinopoiskService _kinopoiskService;
-        private readonly FavoritesService _favoritesService;
+        private readonly Services.KinopoiskService _kinopoiskService;
+        private readonly Services.FavoritesService _favoritesService;
 
-        private ObservableCollection<Film> _films = new ObservableCollection<Film>();
-        private ObservableCollection<Genre> _genres = new ObservableCollection<Genre>();
-        private ObservableCollection<Country> _countries = new ObservableCollection<Country>();
+        private ObservableCollection<Models.Film> _films = new ObservableCollection<Models.Film>();
+        private ObservableCollection<Models.Genre> _genres = new ObservableCollection<Models.Genre>();
+        private ObservableCollection<Models.Country> _countries = new ObservableCollection<Models.Country>();
 
         private bool _isLoading;
         private string _errorMessage;
 
-        private Genre _selectedGenre;
-        private Country _selectedCountry;
+        private Models.Genre _selectedGenre;
+        private Models.Country _selectedCountry;
 
-        public ObservableCollection<Film> Films
+        public ObservableCollection<Models.Film> Films
         {
             get => _films;
             set => SetProperty(ref _films, value);
         }
 
-        public ObservableCollection<Genre> Genres
+        public ObservableCollection<Models.Genre> Genres
         {
             get => _genres;
             set => SetProperty(ref _genres, value);
         }
 
-        public ObservableCollection<Country> Countries
+        public ObservableCollection<Models.Country> Countries
         {
             get => _countries;
             set => SetProperty(ref _countries, value);
         }
 
-        public Genre SelectedGenre
+        public Models.Genre SelectedGenre
         {
             get => _selectedGenre;
             set
@@ -56,7 +58,7 @@ namespace KinopoiskWpfApp.ViewModels
             }
         }
 
-        public Country SelectedCountry
+        public Models.Country SelectedCountry
         {
             get => _selectedCountry;
             set
@@ -83,20 +85,18 @@ namespace KinopoiskWpfApp.ViewModels
         public ICommand LoadFilmsCommand { get; }
         public ICommand AddToFavoritesCommand { get; }
 
-        public MainViewModel(KinopoiskService kinopoiskService, FavoritesService favoritesService)
+        public MainViewModel(Services.KinopoiskService kinopoiskService, Services.FavoritesService favoritesService)
         {
             _kinopoiskService = kinopoiskService ?? throw new ArgumentNullException(nameof(kinopoiskService));
             _favoritesService = favoritesService ?? throw new ArgumentNullException(nameof(favoritesService));
 
             LoadFilmsCommand = new RelayCommand(async () => await LoadFilmsAsync());
-            AddToFavoritesCommand = new RelayCommand<Film>(AddToFavorites);
+            AddToFavoritesCommand = new RelayCommand<Models.Film>(AddToFavorites);
 
-            // Инициализация коллекций
-            Films = new ObservableCollection<Film>();
-            Genres = new ObservableCollection<Genre>();
-            Countries = new ObservableCollection<Country>();
+            Films = new ObservableCollection<Models.Film>();
+            Genres = new ObservableCollection<Models.Genre>();
+            Countries = new ObservableCollection<Models.Country>();
 
-            // Загрузка фильтров и фильмов при старте
             _ = InitializeAsync();
         }
 
@@ -113,17 +113,17 @@ namespace KinopoiskWpfApp.ViewModels
                 var filters = await _kinopoiskService.GetFiltersAsync();
 
                 Genres.Clear();
-                Genres.Add(new Genre { Id = 0, Name = "Все жанры" });
+                Genres.Add(new Models.Genre { Id = 0, Name = "Все жанры" });
                 foreach (var genre in filters.Genres)
-                    Genres.Add(genre);
+                    Genres.Add(new Models.Genre { Id = genre.Id, Name = genre.Name });
 
                 Countries.Clear();
-                Countries.Add(new Country { Id = 0, Name = "Все страны" });
+                Countries.Add(new Models.Country { Id = 0, Name = "Все страны" });
                 foreach (var country in filters.Countries)
-                    Countries.Add(country);
+                    Countries.Add(new Models.Country { Id = country.Id, Name = country.Name });
 
-                SelectedGenre = Genres.First();
-                SelectedCountry = Countries.First();
+                SelectedGenre = Genres.FirstOrDefault();
+                SelectedCountry = Countries.FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -141,11 +141,19 @@ namespace KinopoiskWpfApp.ViewModels
 
                 var films = await _kinopoiskService.GetTopFilmsAsync();
 
-                if (SelectedGenre != null && SelectedGenre.Id != 0)
-                    films = films.Where(f => f.Genres.Any(g => g.Id == SelectedGenre.Id)).ToList();
+                // Фильтрация по жанру
+                if (SelectedGenre != null && SelectedGenre.Id != 0 && !string.IsNullOrWhiteSpace(SelectedGenre.Name))
+                {
+                    var genreName = SelectedGenre.Name.Trim().ToLowerInvariant();
+                    films = films.Where(f => f.Genres.Any(g => !string.IsNullOrWhiteSpace(g.Name) && g.Name.Trim().ToLowerInvariant() == genreName)).ToList();
+                }
 
-                if (SelectedCountry != null && SelectedCountry.Id != 0)
-                    films = films.Where(f => f.Countries.Any(c => c.Id == SelectedCountry.Id)).ToList();
+                // Фильтрация по стране
+                if (SelectedCountry != null && SelectedCountry.Id != 0 && !string.IsNullOrWhiteSpace(SelectedCountry.Name))
+                {
+                    var countryName = SelectedCountry.Name.Trim().ToLowerInvariant();
+                    films = films.Where(f => f.Countries.Any(c => !string.IsNullOrWhiteSpace(c.Name) && c.Name.Trim().ToLowerInvariant() == countryName)).ToList();
+                }
 
                 foreach (var film in films)
                     Films.Add(film);
@@ -164,7 +172,7 @@ namespace KinopoiskWpfApp.ViewModels
             }
         }
 
-        private void AddToFavorites(Film film)
+        private void AddToFavorites(Models.Film film)
         {
             if (film == null) return;
 

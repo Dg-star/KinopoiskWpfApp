@@ -1,9 +1,10 @@
 ﻿using KinopoiskWpfApp.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace KinopoiskWpfApp.Services
 {
@@ -12,6 +13,9 @@ namespace KinopoiskWpfApp.Services
         private const string FavoritesFileName = "favorites.json";
 
         private List<Film> _favorites = new List<Film>();
+
+        // ObservableCollection для UI (уведомляет об изменениях)
+        public ObservableCollection<Film> FavoriteFilms { get; private set; } = new ObservableCollection<Film>();
 
         public FavoritesService()
         {
@@ -24,6 +28,17 @@ namespace KinopoiskWpfApp.Services
             {
                 var json = File.ReadAllText(FavoritesFileName);
                 _favorites = JsonSerializer.Deserialize<List<Film>>(json) ?? new List<Film>();
+            }
+            else
+            {
+                _favorites = new List<Film>();
+            }
+
+            // Заполняем ObservableCollection
+            FavoriteFilms.Clear();
+            foreach (var film in _favorites)
+            {
+                FavoriteFilms.Add(film);
             }
         }
 
@@ -42,6 +57,7 @@ namespace KinopoiskWpfApp.Services
             if (!_favorites.Exists(f => f.FilmId == film.FilmId))
             {
                 _favorites.Add(film);
+                FavoriteFilms.Add(film);
                 SaveFavorites();
             }
         }
@@ -51,6 +67,11 @@ namespace KinopoiskWpfApp.Services
             if (film == null) return;
 
             _favorites.RemoveAll(f => f.FilmId == film.FilmId);
+            var filmInCollection = FavoriteFilms.FirstOrDefault(f => f.FilmId == film.FilmId);
+            if (filmInCollection != null)
+            {
+                FavoriteFilms.Remove(filmInCollection);
+            }
             SaveFavorites();
         }
 
