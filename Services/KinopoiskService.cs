@@ -36,7 +36,7 @@ namespace KinopoiskWpfApp.Services
             return rootObject.Films;
         }
 
-        public async Task<FiltersResponse> GetFiltersAsync()
+        public async Task<FiltersCache> GetFiltersAsync()
         {
             var url = "https://kinopoiskapiunofficial.tech/api/v2.2/films/filters";
 
@@ -46,7 +46,7 @@ namespace KinopoiskWpfApp.Services
 
             var json = await response.Content.ReadAsStringAsync();
 
-            var filters = JsonConvert.DeserializeObject<FiltersResponse>(json);
+            var filters = JsonConvert.DeserializeObject<FiltersCache>(json);
 
             if (filters == null)
                 throw new Exception("Ошибка парсинга фильтров");
@@ -55,38 +55,9 @@ namespace KinopoiskWpfApp.Services
         }
     }
 
-    // Модели для фильмов
     public class RootObject
     {
         [JsonProperty("films")]
         public List<Film> Films { get; set; }
-    }
-
-    // Модели для фильтров
-    public class FiltersResponse
-    {
-        [JsonProperty("genres")]
-        public List<Genre> Genres { get; set; }
-
-        [JsonProperty("countries")]
-        public List<Country> Countries { get; set; }
-    }
-
-    public class Genre
-    {
-        [JsonProperty("genreId")]
-        public int Id { get; set; }
-
-        [JsonProperty("genre")]
-        public string Name { get; set; }
-    }
-
-    public class Country
-    {
-        [JsonProperty("countryId")]
-        public int Id { get; set; }
-
-        [JsonProperty("country")]
-        public string Name { get; set; }
     }
 }

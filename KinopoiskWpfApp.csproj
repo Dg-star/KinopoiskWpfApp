@@ -99,7 +99,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Models\Models.cs" />
     <Compile Include="Services\FavoritesService.cs" />
+    <Compile Include="Services\FiltersCacheService.cs" />
     <Compile Include="Services\KinopoiskService.cs" />
     <Compile Include="ViewModels\FavoritesViewModel.cs" />
     <Compile Include="ViewModels\FilmDetailsViewModel.cs" />
@@ -139,7 +141,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Film.cs" />
     <Compile Include="Models\FilmDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

@@ -5,7 +5,7 @@ namespace KinopoiskWpfApp.Models
 {
     public class Film
     {
-        [JsonProperty("kinopoiskId")]
+        [JsonProperty("filmId")]
         public int FilmId { get; set; }
 
         [JsonProperty("nameRu")]
@@ -24,10 +24,23 @@ namespace KinopoiskWpfApp.Models
         public List<Country> Countries { get; set; } = new List<Country>();
     }
 
+    public class FiltersCache
+    {
+        public List<Genre> Genres { get; set; } = new List<Genre>();
+        public List<Country> Countries { get; set; } = new List<Country>();
+    }
+
     public class Genre
     {
+        // В API встречаются разные имена id, учитываем оба:
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
+
+        [JsonProperty("genreId")]
+        private int? GenreId
+        {
+            set { if (value.HasValue) Id = value; }
+        }
 
         [JsonProperty("genre")]
         public string Name { get; set; }
@@ -36,7 +49,13 @@ namespace KinopoiskWpfApp.Models
     public class Country
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public int? Id { get; set; }
+
+        [JsonProperty("countryId")]
+        private int? CountryId
+        {
+            set { if (value.HasValue) Id = value; }
+        }
 
         [JsonProperty("country")]
         public string Name { get; set; }

@@ -54,10 +54,9 @@ namespace KinopoiskWpfApp.Services
         {
             if (film == null) return;
 
-            if (!_favorites.Exists(f => f.FilmId == film.FilmId))
+            if (film.FilmId > 0 && !_favorites.Exists(f => f.FilmId == film.FilmId))
             {
                 _favorites.Add(film);
-                FavoriteFilms.Add(film);
                 SaveFavorites();
             }
         }
