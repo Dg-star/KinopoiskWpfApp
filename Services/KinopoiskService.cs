@@ -53,6 +53,24 @@ namespace KinopoiskWpfApp.Services
 
             return filters;
         }
+        public async Task<Film> GetFilmDetailsAsync(int filmId)
+        {
+            var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{filmId}";
+
+            var response = await _httpClient.GetAsync(url);
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Ошибка запроса деталей фильма: {response.StatusCode}");
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            var film = JsonConvert.DeserializeObject<Film>(jsonString);
+
+            if (film == null)
+                throw new Exception("Ошибка парсинга деталей фильма");
+
+            return film;
+        }
+
     }
 
     public class RootObject

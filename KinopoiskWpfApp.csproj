@@ -99,6 +99,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\RatingConverter.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Services\FavoritesService.cs" />
     <Compile Include="Services\FilmsCacheService.cs" />
@@ -142,7 +143,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\FilmDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
