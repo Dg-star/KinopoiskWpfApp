@@ -4,7 +4,7 @@
       Title="Избранное">
 
     <Page.Resources>
-        <!-- Стиль для ComboBox фильтров -->
+        <!-- Стиль для ComboBox фильтров со скрытым скроллбаром -->
         <Style TargetType="ComboBox" x:Key="FilterComboBoxStyle">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="#333333"/>
@@ -57,7 +57,9 @@
                                         BorderThickness="1"
                                         MaxHeight="200"
                                         MinWidth="{TemplateBinding ActualWidth}">
-                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                    <!-- ScrollViewer со скрытым скроллбаром -->
+                                    <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                                                  HorizontalScrollBarVisibility="Disabled">
                                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
                                     </ScrollViewer>
                                 </Border>
@@ -85,7 +87,7 @@
         </LinearGradientBrush>
     </Page.Background>
 
-    <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="20">
             <TextBlock Text="Избранные фильмы" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
 
@@ -150,7 +152,7 @@
                                         <Image Source="{Binding PosterUrlPreview}" Stretch="UniformToFill" Width="350" Height="520"/>
                                     </Button>
 
-                                    <!-- Кнопка "Удалить из избранного" поверх постера -->
+                                    <!-- Кнопка "Удалить из избранного" -->
                                     <Button Content="✕"
                                             Command="{Binding DataContext.RemoveFromFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}"
