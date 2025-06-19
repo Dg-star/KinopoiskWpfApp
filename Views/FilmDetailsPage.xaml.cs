@@ -36,7 +36,6 @@ namespace KinopoiskWpfApp.Views
             catch (Exception ex)
             {
                 MessageBox.Show("Не удалось загрузить детали фильма: " + ex.Message);
-                // Если ошибка — показываем базовый фильм без деталей
                 DataContext = new FilmDetailsViewModel(favoritesService, basicFilm);
             }
         }

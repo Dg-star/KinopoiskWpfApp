@@ -11,7 +11,6 @@
             <Setter Property="FontFamily" Value="Segoe UI" />
         </Style>
 
-        <!-- Общий стиль для кнопок -->
         <Style x:Key="BaseButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#2A2A2A" />
             <Setter Property="Foreground" Value="White" />
@@ -50,7 +49,6 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопки Кинопоиск -->
         <Style x:Key="KinopoiskButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
             <Setter Property="Background" Value="#3B7DD8"/>
             <Setter Property="Foreground" Value="White"/>
@@ -75,7 +73,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Основной контент -->
         <Grid Margin="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -83,7 +80,6 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Постер слева -->
             <Border Grid.Column="0" Width="250" Height="375" CornerRadius="5" 
                 Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1"
                 ClipToBounds="True">
@@ -93,13 +89,10 @@
                     VerticalAlignment="Center"/>
             </Border>
 
-            <!-- Основная информация справа -->
             <StackPanel Grid.Column="2" Margin="0,0,0,10">
-                <!-- Название фильма -->
                 <TextBlock Text="{Binding NameRu}" FontSize="24" FontWeight="Bold" 
                            TextWrapping="Wrap"/>
 
-                <!-- Метаданные -->
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
                     <TextBlock Text="{Binding Year}" Foreground="#AAAAAA" Margin="0,0,10,0"/>
                     <TextBlock Text="{Binding FilmLength}" Foreground="#AAAAAA" Margin="0,0,10,0"/>
@@ -107,16 +100,13 @@
                     <TextBlock Text="{Binding CountriesString}" Foreground="#AAAAAA"/>
                 </StackPanel>
 
-                <!-- Оригинальное название -->
                 <TextBlock Text="{Binding NameOriginal}" FontSize="16" Foreground="#CCCCCC" 
                            TextWrapping="Wrap"/>
                 <TextBlock Text="{Binding NameEn}" FontSize="14" Foreground="#999999" 
                            Margin="0,0,0,15" TextWrapping="Wrap"/>
 
-                <!-- Рейтинги -->
                 <Border Background="#1A1A1A" CornerRadius="5" Padding="10" Margin="0,0,0,15">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <!-- Кинопоиск -->
                         <StackPanel MinWidth="80" Margin="0,0,15,0">
                             <TextBlock Text="Кинопоиск" FontWeight="SemiBold" 
                                        HorizontalAlignment="Center" FontSize="14"/>
@@ -124,7 +114,6 @@
                                        FontSize="20" HorizontalAlignment="Center" Margin="0,3"/>
                         </StackPanel>
 
-                        <!-- IMDB -->
                         <StackPanel MinWidth="80" Margin="0,0,15,0">
                             <TextBlock Text="IMDB" FontWeight="SemiBold" 
                                        HorizontalAlignment="Center" FontSize="14"/>
@@ -132,7 +121,6 @@
                                        FontSize="20" HorizontalAlignment="Center" Margin="0,3"/>
                         </StackPanel>
 
-                        <!-- Критики -->
                         <StackPanel MinWidth="80">
                             <TextBlock Text="Критики" FontWeight="SemiBold" 
                                        HorizontalAlignment="Center" FontSize="14"/>
@@ -142,17 +130,14 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Слоган -->
                 <TextBlock Text="{Binding Slogan}" FontStyle="Italic" Foreground="#AAAAAA" 
                            TextWrapping="Wrap" Margin="0,0,0,10"/>
 
-                <!-- Описание -->
                 <TextBlock Text="{Binding Description}" TextWrapping="Wrap" FontSize="13" 
                            LineHeight="20" Margin="0,0,0,15"/>
             </StackPanel>
         </Grid>
 
-        <!-- Кнопки внизу -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0,0,20" HorizontalAlignment="Left">
             <Button Content="Открыть на Кинопоиске" 
                     Command="{Binding OpenKinopoiskCommand}"

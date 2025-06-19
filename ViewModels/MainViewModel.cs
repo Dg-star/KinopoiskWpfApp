@@ -183,7 +183,6 @@ namespace KinopoiskWpfApp.ViewModels
                 {
                     films = await _kinopoiskService.GetTopFilmsAsync();
 
-                    // Убираем дубли из API
                     films = films
                         .GroupBy(f => f.FilmId)
                         .Select(g => g.First())

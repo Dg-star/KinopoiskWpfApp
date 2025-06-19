@@ -4,7 +4,39 @@
       Title="Избранное">
 
     <Page.Resources>
-        <!-- Стиль для ComboBox фильтров со скрытым скроллбаром -->
+        <Style x:Key="HiddenScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <ScrollContentPresenter Grid.Column="0" Grid.Row="0"/>
+
+                            <ScrollBar x:Name="PART_VerticalScrollBar" 
+                                     Grid.Column="1" 
+                                     Grid.Row="0"
+                                     Visibility="Collapsed"/>
+                            <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                     Grid.Column="0"
+                                     Grid.Row="1"
+                                     Orientation="Horizontal"
+                                     Visibility="Collapsed"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="ComboBox" x:Key="FilterComboBoxStyle">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="#333333"/>
@@ -21,45 +53,44 @@
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
                             <ToggleButton x:Name="ToggleButton"
-                                          Background="{TemplateBinding Background}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          BorderThickness="{TemplateBinding BorderThickness}"
-                                          Focusable="False"
-                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                                          ClickMode="Press">
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Focusable="False"
+                                        IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ClickMode="Press">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
                                         <ColumnDefinition Width="20"/>
                                     </Grid.ColumnDefinitions>
                                     <ContentPresenter Grid.Column="0"
-                                                      Margin="5,2,0,2"
-                                                      VerticalAlignment="Center"
-                                                      HorizontalAlignment="Left"
-                                                      Content="{TemplateBinding SelectionBoxItem}"
-                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                                      RecognizesAccessKey="True"/>
+                                                    Margin="5,2,0,2"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Left"
+                                                    Content="{TemplateBinding SelectionBoxItem}"
+                                                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                    ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                    RecognizesAccessKey="True"/>
                                     <Path Grid.Column="1" Margin="0,0,5,0"
-                                          VerticalAlignment="Center"
-                                          Fill="White"
-                                          Data="M 0 0 L 4 4 L 8 0 Z"/>
+                                        VerticalAlignment="Center"
+                                        Fill="White"
+                                        Data="M 0 0 L 4 4 L 8 0 Z"/>
                                 </Grid>
                             </ToggleButton>
                             <Popup x:Name="Popup"
-                                   Placement="Bottom"
-                                   IsOpen="{TemplateBinding IsDropDownOpen}"
-                                   AllowsTransparency="True"
-                                   Focusable="False"
-                                   PopupAnimation="Fade">
+                                Placement="Bottom"
+                                IsOpen="{TemplateBinding IsDropDownOpen}"
+                                AllowsTransparency="True"
+                                Focusable="False"
+                                PopupAnimation="Fade">
                                 <Border Background="#333333"
-                                        BorderBrush="#666666"
-                                        BorderThickness="1"
-                                        MaxHeight="200"
-                                        MinWidth="{TemplateBinding ActualWidth}">
-                                    <!-- ScrollViewer со скрытым скроллбаром -->
+                                    BorderBrush="#666666"
+                                    BorderThickness="1"
+                                    MaxHeight="200"
+                                    MinWidth="{TemplateBinding ActualWidth}">
                                     <ScrollViewer VerticalScrollBarVisibility="Hidden"
-                                                  HorizontalScrollBarVisibility="Disabled">
+                                                HorizontalScrollBarVisibility="Disabled">
                                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
                                     </ScrollViewer>
                                 </Border>
@@ -87,24 +118,27 @@
         </LinearGradientBrush>
     </Page.Background>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer Style="{StaticResource HiddenScrollViewerStyle}">
         <StackPanel Margin="20">
-            <TextBlock Text="Избранные фильмы" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+            <!-- Заголовок -->
+            <TextBlock Text="Избранные фильмы" 
+                     FontSize="24" 
+                     FontWeight="Bold" 
+                     Foreground="White" 
+                     Margin="0,0,0,10"/>
 
-            <!-- Фильтры -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                 <ComboBox Style="{StaticResource FilterComboBoxStyle}"
-                          ItemsSource="{Binding Genres}"
-                          DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedGenre}"/>
+                        ItemsSource="{Binding Genres}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedGenre}"/>
                 <ComboBox Style="{StaticResource FilterComboBoxStyle}"
-                          ItemsSource="{Binding Countries}"
-                          DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedCountry}"
-                          Margin="10,0,0,0"/>
+                        ItemsSource="{Binding Countries}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedCountry}"
+                        Margin="10,0,0,0"/>
             </StackPanel>
 
-            <!-- Фильмы -->
             <ItemsControl ItemsSource="{Binding FilteredFavoriteFilms}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -145,14 +179,12 @@
 
                             <StackPanel>
                                 <Grid Width="350" Height="520">
-                                    <!-- Постер -->
                                     <Button Command="{Binding DataContext.NavigateToFilmDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderBrush="Transparent">
                                         <Image Source="{Binding PosterUrlPreview}" Stretch="UniformToFill" Width="350" Height="520"/>
                                     </Button>
 
-                                    <!-- Кнопка "Удалить из избранного" -->
                                     <Button Content="✕"
                                             Command="{Binding DataContext.RemoveFromFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}"
@@ -162,7 +194,6 @@
                                             Cursor="Hand"/>
                                 </Grid>
 
-                                <!-- Название и год -->
                                 <TextBlock Text="{Binding NameRu}" FontWeight="Bold" Foreground="White" TextAlignment="Center" TextWrapping="Wrap" Margin="0,5,0,0"/>
                                 <TextBlock Text="{Binding Year}" FontStyle="Italic" Foreground="Gray" TextAlignment="Center"/>
                             </StackPanel>

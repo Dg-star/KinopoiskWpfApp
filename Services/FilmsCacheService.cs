@@ -22,7 +22,6 @@ namespace KinopoiskWpfApp.Services
                     }
                     catch
                     {
-                        // Можно залогировать ошибку, если нужно
                         return null;
                     }
                 }

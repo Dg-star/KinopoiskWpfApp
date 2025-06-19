@@ -108,9 +108,7 @@ namespace KinopoiskWpfApp.Services
             {
                 throw new KinopoiskApiException("Запрошенный ресурс не найден.");
             }
-
-            // Для .NET Framework, где нет HttpStatusCode.TooManyRequests (429)
-            if ((int)statusCode == 429) // Too Many Requests
+            if ((int)statusCode == 429)
             {
                 throw new KinopoiskApiException("Превышен лимит запросов. Попробуйте позже.");
             }

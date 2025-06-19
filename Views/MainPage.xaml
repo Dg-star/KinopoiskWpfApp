@@ -4,7 +4,40 @@
       Title="Главная">
 
     <Page.Resources>
-        <!-- Стиль для ComboBox со скрытым скроллбаром -->
+        <Style x:Key="HiddenScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <ScrollContentPresenter Grid.Column="0" Grid.Row="0"/>
+
+                            <ScrollBar x:Name="PART_VerticalScrollBar" 
+                                     Grid.Column="1" 
+                                     Grid.Row="0"
+                                     Visibility="Collapsed"/>
+                            <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                     Grid.Column="0"
+                                     Grid.Row="1"
+                                     Orientation="Horizontal"
+                                     Visibility="Collapsed"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
         <Style TargetType="ComboBox" x:Key="FilterComboBoxStyle">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="#333333"/>
@@ -57,7 +90,6 @@
                                     BorderThickness="1"
                                     MaxHeight="200"
                                     MinWidth="{TemplateBinding ActualWidth}">
-                                    <!-- ScrollViewer со скрытым скроллбаром -->
                                     <ScrollViewer VerticalScrollBarVisibility="Hidden"
                                                 HorizontalScrollBarVisibility="Disabled">
                                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
@@ -87,11 +119,14 @@
         </LinearGradientBrush>
     </Page.Background>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer Style="{StaticResource HiddenScrollViewerStyle}">
         <StackPanel Margin="20">
-            <TextBlock Text="Популярные фильмы" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+            <TextBlock Text="Популярные фильмы" 
+                     FontSize="24" 
+                     FontWeight="Bold" 
+                     Foreground="White" 
+                     Margin="0,0,0,10"/>
 
-            <!-- Фильтры -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                 <ComboBox Style="{StaticResource FilterComboBoxStyle}"
                         ItemsSource="{Binding Genres}"
@@ -104,7 +139,6 @@
                         Margin="10,0,0,0"/>
             </StackPanel>
 
-            <!-- Фильмы -->
             <ItemsControl ItemsSource="{Binding Films}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -145,14 +179,12 @@
 
                             <StackPanel>
                                 <Grid Width="350" Height="520">
-                                    <!-- Постер -->
                                     <Button Command="{Binding DataContext.NavigateToFilmDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderBrush="Transparent">
                                         <Image Source="{Binding PosterUrlPreview}" Stretch="UniformToFill" Width="350" Height="520"/>
                                     </Button>
 
-                                    <!-- Кнопка "Добавить в избранное" -->
                                     <Button Content="★"
                                             Command="{Binding DataContext.AddToFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}"
@@ -173,7 +205,6 @@
                                     </Button>
                                 </Grid>
 
-                                <!-- Название и год -->
                                 <TextBlock Text="{Binding NameRu}" FontWeight="Bold" Foreground="White" TextAlignment="Center" TextWrapping="Wrap" Margin="0,5,0,0"/>
                                 <TextBlock Text="{Binding Year}" FontStyle="Italic" Foreground="Gray" TextAlignment="Center"/>
                             </StackPanel>
