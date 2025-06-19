@@ -1,51 +1,54 @@
 ﻿using KinopoiskWpfApp.Services;
 using KinopoiskWpfApp.ViewModels;
 using KinopoiskWpfApp.Views;
-using System;
 using System.Windows;
-using System.Windows.Navigation;
 
 namespace KinopoiskWpfApp
 {
     public partial class MainWindow : Window
     {
+        private readonly KinopoiskService _kinopoiskService = new KinopoiskService();
+        private readonly FavoritesService _favoritesService = new FavoritesService();
+        private readonly FiltersCacheService _filtersCacheService = new FiltersCacheService();
+        private readonly FilmsCacheService _filmsCacheService = new FilmsCacheService();
+
         public MainWindow()
         {
             InitializeComponent();
 
-            Loaded += MainWindow_Loaded;
+            Loaded += (s, e) => NavigateToMain();
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void NavigateToMain()
         {
-            var kinopoiskService = new KinopoiskService();
-            var favoritesService = new FavoritesService();
-            var filtersCacheService = new FiltersCacheService();
-            var filmsCacheService = new FilmsCacheService();
+            var vm = new MainViewModel(
+                _kinopoiskService,
+                _favoritesService,
+                _filtersCacheService,
+                _filmsCacheService,
+                MainFrame.NavigationService);
 
-            var mainPage = new MainPage();
-            MainFrame.Navigate(mainPage);
+            MainFrame.Navigate(new MainPage { DataContext = vm });
+        }
 
-            var navigationService = MainFrame.NavigationService;
+        private void NavigateToFavorites()
+        {
+            var vm = new FavoritesViewModel(
+                _favoritesService,
+                _filtersCacheService,
+                MainFrame.NavigationService);
 
-            var mainVM = new MainViewModel(
-                kinopoiskService,
-                favoritesService,
-                filtersCacheService,
-                filmsCacheService,
-                navigationService);
-
-            mainPage.DataContext = mainVM;
+            MainFrame.Navigate(new FavoritesPage { DataContext = vm });
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.GoBack();
+            NavigateToMain();
         }
 
         private void FavoritesButton_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new FavoritesPage());
+            NavigateToFavorites();
         }
     }
 }

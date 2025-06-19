@@ -18,8 +18,6 @@
             <TextBlock Text="Страны:" FontWeight="Bold"/>
             <TextBlock Text="{Binding CountriesString}" Margin="0,0,0,20"/>
 
-            <!-- Здесь можно добавить другие подробности, например описание, режиссёра и т.д., если есть -->
-
             <Button Content="Добавить в избранное"
                     Command="{Binding AddToFavoritesCommand}"
                     Margin="0,10,0,0" Width="200" />

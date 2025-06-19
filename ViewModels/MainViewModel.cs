@@ -206,7 +206,10 @@ namespace KinopoiskWpfApp.ViewModels
                     films = films.Where(f => f.Countries.Any(c => string.Equals(c.Name, SelectedCountry.Name, StringComparison.OrdinalIgnoreCase))).ToList();
 
                 foreach (var film in films)
+                {
+                    film.IsFavorite = _favoritesService.IsFavorite(film);
                     Films.Add(film);
+                }
 
                 if (Films.Count == 0)
                     ErrorMessage = "Нет фильмов по выбранным фильтрам.";
@@ -222,6 +225,7 @@ namespace KinopoiskWpfApp.ViewModels
             }
         }
 
+
         private void AddToFavorites(Film film)
         {
             if (film == null) return;
@@ -229,6 +233,7 @@ namespace KinopoiskWpfApp.ViewModels
             try
             {
                 _favoritesService.AddToFavorites(film);
+                film.IsFavorite = true;
             }
             catch (Exception ex)
             {

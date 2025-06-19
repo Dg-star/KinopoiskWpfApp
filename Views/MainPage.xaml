@@ -48,7 +48,18 @@
                                                 Background="Transparent" BorderBrush="Transparent"
                                                 FontSize="20" Foreground="Yellow"
                                                 Margin="10"
-                                                Panel.ZIndex="2"/>
+                                                Panel.ZIndex="2">               
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
 
                                         <!-- Кнопка, оборачивающая постер и отвечающая за навигацию -->
                                         <Button Command="{Binding DataContext.NavigateToFilmDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"

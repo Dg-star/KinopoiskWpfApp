@@ -2,11 +2,13 @@
 using CommunityToolkit.Mvvm.Input;
 using KinopoiskWpfApp.Models;
 using KinopoiskWpfApp.Services;
+using KinopoiskWpfApp.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace KinopoiskWpfApp.ViewModels
 {
@@ -14,6 +16,7 @@ namespace KinopoiskWpfApp.ViewModels
     {
         private readonly FavoritesService _favoritesService;
         private readonly FiltersCacheService _filtersCacheService;
+        private readonly NavigationService _navigationService;
 
         private ObservableCollection<Film> _allFavoriteFilms;
         private ObservableCollection<Film> _filteredFavoriteFilms;
@@ -60,13 +63,26 @@ namespace KinopoiskWpfApp.ViewModels
                     ApplyFilters();
             }
         }
-
+        public ICommand NavigateToFilmDetailsCommand { get; }
         public ICommand RemoveFromFavoritesCommand { get; }
 
-        public FavoritesViewModel(FavoritesService favoritesService, FiltersCacheService filtersCacheService)
+        public FavoritesViewModel(FavoritesService favoritesService, FiltersCacheService filtersCacheService, NavigationService navigationService)
         {
-            _favoritesService = favoritesService;
-            _filtersCacheService = filtersCacheService;
+            _favoritesService = favoritesService ?? throw new ArgumentNullException(nameof(favoritesService));
+            _filtersCacheService = filtersCacheService ?? throw new ArgumentNullException(nameof(filtersCacheService));
+            _navigationService = navigationService;
+            NavigateToFilmDetailsCommand = new RelayCommand<Film>(film =>
+            {
+                if (film == null) return;
+
+                var detailsVM = new FilmDetailsViewModel(_favoritesService, film);
+                var detailsPage = new FilmDetailsPage(_favoritesService, film)
+                {
+                    DataContext = detailsVM
+                };
+
+                _navigationService.Navigate(detailsPage);
+            });
 
             _allFavoriteFilms = new ObservableCollection<Film>(_favoritesService.GetFavorites());
             FilteredFavoriteFilms = new ObservableCollection<Film>(_allFavoriteFilms);
@@ -78,6 +94,7 @@ namespace KinopoiskWpfApp.ViewModels
 
             LoadFilters();
         }
+
 
         private void LoadFilters()
         {

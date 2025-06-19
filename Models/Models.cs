@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace KinopoiskWpfApp.Models
 {
-    public class Film
+    public class Film : ObservableObject
     {
         [JsonProperty("filmId")]
         public int FilmId { get; set; }
@@ -22,6 +24,13 @@ namespace KinopoiskWpfApp.Models
 
         [JsonProperty("countries")]
         public List<Country> Countries { get; set; } = new List<Country>();
+
+        private bool _isFavorite;
+        public bool IsFavorite
+        {
+            get => _isFavorite;
+            set => SetProperty(ref _isFavorite, value);
+        }
     }
 
     public class FiltersCache

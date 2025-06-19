@@ -20,7 +20,7 @@
                           SelectedItem="{Binding SelectedCountry}"/>
             </StackPanel>
 
-            <!-- Сетка фильмов с прокруткой -->
+            <!-- Обёртка с прокруткой -->
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="600">
                 <ItemsControl ItemsSource="{Binding FilteredFavoriteFilms}">
                     <ItemsControl.ItemsPanel>
@@ -41,17 +41,30 @@
                             <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Width="360">
                                 <StackPanel>
                                     <Grid>
-                                        <Image Source="{Binding PosterUrlPreview}" Stretch="Uniform" Width="360" Height="540"/>
-
+                                        <!-- Кнопка "Удалить из избранного" -->
                                         <Button Content="✕"
                                                 HorizontalAlignment="Left" VerticalAlignment="Top"
                                                 Command="{Binding DataContext.RemoveFromFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderBrush="Transparent"
                                                 FontSize="20" Foreground="Red"
-                                                Margin="10"/>
+                                                Margin="10"
+                                                Panel.ZIndex="2"/>
+
+                                        <!-- Кнопка навигации к деталям -->
+                                        <Button Command="{Binding DataContext.NavigateToFilmDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderBrush="Transparent"
+                                                Padding="0"
+                                                Margin="0"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Stretch"
+                                                Panel.ZIndex="1">
+                                            <Image Source="{Binding PosterUrlPreview}" Stretch="UniformToFill" Width="360" Height="540"/>
+                                        </Button>
                                     </Grid>
 
+                                    <!-- Название и год -->
                                     <StackPanel Margin="0,5,0,10" HorizontalAlignment="Center">
                                         <TextBlock Text="{Binding NameRu}" FontWeight="Bold" TextAlignment="Center" TextWrapping="Wrap" Width="340"/>
                                         <TextBlock Text="{Binding Year}" FontStyle="Italic" Foreground="Gray" TextAlignment="Center"/>
