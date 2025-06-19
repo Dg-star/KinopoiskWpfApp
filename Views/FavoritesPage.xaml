@@ -3,78 +3,171 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Избранное">
 
-    <Grid Margin="20">
-        <StackPanel>
-            <TextBlock Text="Избранные фильмы" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+    <Page.Resources>
+        <!-- Стиль для ComboBox фильтров -->
+        <Style TargetType="ComboBox" x:Key="FilterComboBoxStyle">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="BorderBrush" Value="#666666"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="MinWidth" Value="200"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="20"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter Grid.Column="0"
+                                                      Margin="5,2,0,2"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                      RecognizesAccessKey="True"/>
+                                    <Path Grid.Column="1" Margin="0,0,5,0"
+                                          VerticalAlignment="Center"
+                                          Fill="White"
+                                          Data="M 0 0 L 4 4 L 8 0 Z"/>
+                                </Grid>
+                            </ToggleButton>
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade">
+                                <Border Background="#333333"
+                                        BorderBrush="#666666"
+                                        BorderThickness="1"
+                                        MaxHeight="200"
+                                        MinWidth="{TemplateBinding ActualWidth}">
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="Popup" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#888"/>
+                                <Setter TargetName="ToggleButton" Property="Background" Value="#222"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Page.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#1f1f1f" Offset="0"/>
+            <GradientStop Color="#2c2c2c" Offset="1"/>
+        </LinearGradientBrush>
+    </Page.Background>
+
+    <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="20">
+            <TextBlock Text="Избранные фильмы" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
 
             <!-- Фильтры -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <ComboBox Width="200"
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <ComboBox Style="{StaticResource FilterComboBoxStyle}"
                           ItemsSource="{Binding Genres}"
                           DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedGenre}" 
-                          Margin="0,0,10,0"/>
-                <ComboBox Width="200"
+                          SelectedItem="{Binding SelectedGenre}"/>
+                <ComboBox Style="{StaticResource FilterComboBoxStyle}"
                           ItemsSource="{Binding Countries}"
                           DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedCountry}"/>
+                          SelectedItem="{Binding SelectedCountry}"
+                          Margin="10,0,0,0"/>
             </StackPanel>
 
-            <!-- Обёртка с прокруткой -->
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Height="600">
-                <ItemsControl ItemsSource="{Binding FilteredFavoriteFilms}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+            <!-- Фильмы -->
+            <ItemsControl ItemsSource="{Binding FilteredFavoriteFilms}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
-                    <ItemsControl.ItemContainerStyle>
-                        <Style>
-                            <Setter Property="FrameworkElement.Margin" Value="5"/>
-                            <Setter Property="FrameworkElement.Width" Value="360" />
-                        </Style>
-                    </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="8" Margin="10" Width="360"
+                                Background="#2a2a2a" Padding="5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="scale" ScaleX="1" ScaleY="1"/>
+                            </Border.RenderTransform>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Width="360">
-                                <StackPanel>
-                                    <Grid>
-                                        <!-- Кнопка "Удалить из избранного" -->
-                                        <Button Content="✕"
-                                                HorizontalAlignment="Left" VerticalAlignment="Top"
-                                                Command="{Binding DataContext.RemoveFromFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                CommandParameter="{Binding}"
-                                                Background="Transparent" BorderBrush="Transparent"
-                                                FontSize="20" Foreground="Red"
-                                                Margin="10"
-                                                Panel.ZIndex="2"/>
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.3"/>
+                            </Border.Effect>
 
-                                        <!-- Кнопка навигации к деталям -->
-                                        <Button Command="{Binding DataContext.NavigateToFilmDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                CommandParameter="{Binding}"
-                                                Background="Transparent" BorderBrush="Transparent"
-                                                Padding="0"
-                                                Margin="0"
-                                                HorizontalAlignment="Stretch"
-                                                VerticalAlignment="Stretch"
-                                                Panel.ZIndex="1">
-                                            <Image Source="{Binding PosterUrlPreview}" Stretch="UniformToFill" Width="360" Height="540"/>
-                                        </Button>
-                                    </Grid>
+                            <Border.Triggers>
+                                <EventTrigger RoutedEvent="MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="scale" Storyboard.TargetProperty="ScaleX" To="1.05" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="scale" Storyboard.TargetProperty="ScaleY" To="1.05" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="scale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="scale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Border.Triggers>
 
-                                    <!-- Название и год -->
-                                    <StackPanel Margin="0,5,0,10" HorizontalAlignment="Center">
-                                        <TextBlock Text="{Binding NameRu}" FontWeight="Bold" TextAlignment="Center" TextWrapping="Wrap" Width="340"/>
-                                        <TextBlock Text="{Binding Year}" FontStyle="Italic" Foreground="Gray" TextAlignment="Center"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                            <StackPanel>
+                                <Grid Width="350" Height="520">
+                                    <!-- Постер -->
+                                    <Button Command="{Binding DataContext.NavigateToFilmDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderBrush="Transparent">
+                                        <Image Source="{Binding PosterUrlPreview}" Stretch="UniformToFill" Width="350" Height="520"/>
+                                    </Button>
+
+                                    <!-- Кнопка "Удалить из избранного" поверх постера -->
+                                    <Button Content="✕"
+                                            Command="{Binding DataContext.RemoveFromFavoritesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            Background="#66000000" BorderBrush="Transparent"
+                                            FontSize="20" Foreground="Red"
+                                            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" Width="40" Height="40"
+                                            Cursor="Hand"/>
+                                </Grid>
+
+                                <!-- Название и год -->
+                                <TextBlock Text="{Binding NameRu}" FontWeight="Bold" Foreground="White" TextAlignment="Center" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding Year}" FontStyle="Italic" Foreground="Gray" TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </Page>
